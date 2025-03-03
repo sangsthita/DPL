@@ -1,0 +1,53 @@
+## Deep Learning Lab work - 1 
+# Name : Sangsthita Panda 
+# Title : Forward Propagation in a Multi-Layer Neural Network with ReLU Activation
+
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame([[8,8,4], [7,9,5], [6,10,6], [5,12,7]], columns=['cgpa', 'profile_score', 'lpa'])
+
+def initialize_parameters(layers_dims):
+    np.random.seed(3)
+    parameters = {}
+    L = len(layers_dims)
+    for i in range(1, L):
+        parameters['W' + str(i)] = np.ones((layers_dims[i-1], layers_dims[i])) * 0.1
+        parameters['b' + str(i)] = np.zeros((layers_dims[i], 1))
+    return parameters
+
+def linear_forward(A_prev, W, b):
+    Z = np.dot(W.T, A_prev) + b
+    return Z
+
+def relu(Z):
+    return np.maximum(0, Z)
+
+def L_layer_forward(X, parameters):
+    A = X
+    caches = []
+    L = len(parameters) // 2  # number of layers
+    for i in range(1, L):
+        A_prev = A
+        W = parameters['W' + str(i)]
+        b = parameters['b' + str(i)]
+        Z = linear_forward(A_prev, W, b)
+        A = relu(Z)
+        cache = (A_prev, W, b, Z)
+        caches.append(cache)
+    
+    # Output layer (after the loop)
+    W_out = parameters['W' + str(L)]
+    b_out = parameters['b' + str(L)]
+    Z_out = linear_forward(A, W_out, b_out)
+    AL = Z_out
+    
+    return AL, caches
+
+# Example of calling the functions
+layers_dims = [3, 4, 2, 1]  # Example dimensions (input size 3, two hidden layers with 4 and 2 neurons, output size 1)
+parameters = initialize_parameters(layers_dims)
+X = np.array([[8], [7], [6]])  # Example input
+
+AL, caches = L_layer_forward(X, parameters)
+print("Output of the forward pass:", AL)
